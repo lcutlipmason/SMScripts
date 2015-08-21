@@ -35,7 +35,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-#Change the Email to a UserName only
+#If email change to a UserName only
 OIFS=$IFS;
 IFS="@";
 USERNAME_RSA=($IAM_USERNAME);
