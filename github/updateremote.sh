@@ -3,13 +3,14 @@
 #cli param 1 is the org name in github
 
 ORG=$1
+ORIGIN=NAMEOFORIGINTOCHANGE
 
 function update {
 	for i in $1; do
 	    
 		echo "$i"
-		git -C "$(cut -d'.' -f1 <<<"$i")" remote remove origin
-		git -C "$(cut -d'.' -f1 <<<"$i")" remote add origin git@github.com:$ORG/$(basename "${i%.*}").git
+		git -C "$(cut -d'.' -f1 <<<"$i")" remote remove $ORIGIN 
+		git -C "$(cut -d'.' -f1 <<<"$i")" remote add $ORIGIN git@github.com:$ORG/$(basename "${i%.*}").git
 		#Enable next line to do a fetch
 		#git -C "$(cut -d'.' -f1 <<<"$i")" fetch
 	   

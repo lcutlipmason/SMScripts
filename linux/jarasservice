@@ -1,0 +1,62 @@
+#!/bin/sh
+# chkconfig: 2345 95 05
+
+SERVICE_NAME=<NAME>
+PATH_TO_JAR=<FPath/JAR>
+PID_FILE=/tmp/service-interface.pid
+LOG_NAME=<FPath/Logfile>
+
+# colors
+red='\e[0;31m'
+green='\e[0;32m'
+yellow='\e[0;33m'
+reset='\e[0m'
+
+echoRed() { echo -e "${red}$1${reset}"; }
+echoGreen() { echo -e "${green}$1${reset}"; }
+echoYellow() { echo -e "${yellow}$1${reset}"; }
+
+launch() {
+        echoGreen "Starting $SERVICE_NAME ..."
+        if [ -f $PID_FILE ]; then
+                PID=`cat $PID_FILE`
+                if [ -z "`ps axf | grep -w $PID | grep -v grep`" ]; then
+                        nohup java -jar $PATH_TO_JAR > $LOG_NAME 2>&1 </dev/null &
+                        echo $! > $PID_FILE
+                        echo "$SERVICE_NAME started ..."
+                else
+                        echoYellow "Already running [$PID]"
+                fi
+        else
+                nohup java -jar $PATH_TO_JAR > $LOG_NAME 2>&1 </dev/null &
+                echo $! > $PID_FILE
+                echoGreen "$SERVICE_NAME started ..."
+        fi
+}
+
+killit () {
+        if [ -f $PID_FILE ]; then
+                PID=`cat $PID_FILE`
+                if [ -n "`ps axf | grep -w $PID | grep -v grep`" ]; then
+                       echo "$SERVICE_NAME stoping ..."
+                       kill $PID;
+                else
+                        echoYellow "[$PID] Not Found running, will delete PID to reset"
+                fi
+                        rm $PID_FILE
+                        echoGreen "$SERVICE_NAME stopped ..."
+        fi
+}
+
+case $1 in
+    start)
+        launch
+    ;;
+    stop)
+        killit
+    ;;
+    restart)
+        launch
+        killit
+    ;;
+esac
